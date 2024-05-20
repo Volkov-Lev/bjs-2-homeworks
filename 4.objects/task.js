@@ -13,18 +13,20 @@ function Student(name, gender, age) {
   
   // Метод для добавления нескольких оценок студенту
   Student.prototype.addMarks = function(...marksToAdd) {
-    if (!this.marks) {
-      throw new Error('Student is excluded');
+    if (this.marks) {
+      this.marks.push(...marksToAdd);
+    } else {
+      console.error('Student is excluded');
     }
-    this.marks.push(...marksToAdd);
   };
   
   // Метод для получения среднего балла студента
   Student.prototype.getAverage = function() {
-    if (!this.marks || this.marks.length === 0) {
+    if (this.marks && this.marks.length > 0) {
+      return this.marks.reduce((sum, value) => sum + value, 0) / this.marks.length;
+    } else {
       return 0;
     }
-    return this.marks.reduce((sum, value) => sum + value, 0) / this.marks.length;
   };
   
   // Метод для исключения студента из учебного процесса
