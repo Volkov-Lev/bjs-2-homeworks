@@ -28,7 +28,7 @@ function getArrayParams(...arr) {
 	};
 }
 
-function summElementsWorker(...arr) {
+     function summElementsWorker(...arr) {
 
 	let sum = 0;
 
