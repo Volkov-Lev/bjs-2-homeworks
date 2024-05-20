@@ -1,3 +1,4 @@
+
 function compareArrays(arr1, arr2) {
     // Проверяем, что массивы имеют одинаковую длину
     if (arr1.length !== arr2.length) {
