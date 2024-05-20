@@ -98,9 +98,8 @@ function averageEvenElementsWorker(...arr) {
 			countEvenElement++;
 		}
 	}
-
-	return sumEvenElement / countEvenElement;
-
+  
+  return sumEvenElement / countEvenElement;
 }
 
 function makeWork(arrOfArr, func) {
@@ -112,6 +111,6 @@ function makeWork(arrOfArr, func) {
 			maxWorkerResult = currentWorkerResult;
 		}
 	}
-	return maxWorkerResult;
-
+	
+  return maxWorkerResult;
 }
