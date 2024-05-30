@@ -1,38 +1,41 @@
 //Задача № 1
-const md5 = require('js-md5').md5;
+const md5 = require('js-md5').md5; // Импорт библиотеки для MD5
 
 function cachingDecoratorNew(func) {
-  let cache = []; // Массив для хранения хешей и результатов
+  let cache = [];
 
   function wrapper(...args) {
-    // Получаем хеш для аргументов функции
-    const hash = md5(JSON.stringify(args));
+    const hash = md5(JSON.stringify(args)); // Хеширование аргументов
+    let objectInCache = cache.find(item => item.hash === hash); // Поиск в кеше
 
-    // Ищем хеш в кеше
-     let objectInCache = cache.find(item => item.hash === hash);
-
-    if (objectInCache) { // Если нашли, возвращаем значение из кеша
-      console.log("Из кеша: " + objectInCache.value);
-      return "Из кеша: " + objectInCache.value;
+    if (objectInCache) {
+      return `Из кеша: ${objectInCache.value}`; // Возвращение значения из кеша
     }
 
-    // Вычисляем результат функции
-    let result = func(...args);
+    let result = func(...args); // Вызов функции
+    cache.push({ hash, value: result }); // Сохранение результата в кеше
 
-    // Добавляем новый элемент в кеш
-    cache.push({ hash, value: result });
-
-    // Удаляем первый элемент, если кеш переполнен
     if (cache.length > 5) {
-      cache.shift();
+      cache.shift(); // Удаление первого элемента, если кеш переполнен
     }
 
-    console.log("Вычисляем: " + result);
-    return "Вычисляем: " + result;
+    return `Вычисляем: ${result}`; // Возвращение строки с результатом
   }
 
   return wrapper;
 }
+
+// Пример использования
+const addAndMultiply = (a, b, c) => (a + b) * c;
+const upgraded = cachingDecoratorNew(addAndMultiply);
+upgraded(1, 2, 3); // Вычисляем: 9
+upgraded(1, 2, 3); // Из кеша: 9
+upgraded(2, 2, 3); // Вычисляем: 12
+upgraded(3, 2, 3); // Вычисляем: 15
+upgraded(4, 2, 3); // Вычисляем: 18
+upgraded(5, 2, 3); // Вычисляем: 21
+upgraded(6, 2, 3); // Вычисляем: 24 (при этом кеш для 1, 2, 3 уничтожается)
+upgraded(1, 2, 3); // Вычисляем: 9  (снова вычисляем, кеша нет)
 
 //Задача № 2
 function debounceDecoratorNew(func, delay) {
