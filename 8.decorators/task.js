@@ -1,58 +1,70 @@
-"use strict"
-
 //Задача № 1
-function cachingDecoratorNew(func) {
-    let cache = [];
+const md5 = require('js-md5').md5;
 
-    function wrapper(...args) {
-        const hash = args.join(',')
-        let objectInCache = cache.findIndex((item) => item.hash === hash)
-        if (objectInCache !== -1) {
-            console.log("Из кэша: " + cache[objectInCache].value);
-            return "Из кэша: " + cache[objectInCache].value;
-        }
-        let result = func(...args);
-        cache.push({
-            hash: args.join(','),
-            value: result
-        })
-        if (cache.length > 5) {
-            cache.splice(0, 1);
-        }
-        console.log("Вычисляем: " + result);
-        return "Вычисляем: " + result;
+function cachingDecoratorNew(func) {
+  let cache = []; // Массив для хранения хешей и результатов
+
+  function wrapper(...args) {
+    // Получаем хеш для аргументов функции
+    const hash = md5(JSON.stringify(args));
+
+    // Ищем хеш в кеше
+     let objectInCache = cache.find(item => item.hash === hash);
+
+    if (objectInCache) { // Если нашли, возвращаем значение из кеша
+      console.log("Из кеша: " + objectInCache.value);
+      return "Из кеша: " + objectInCache.value;
     }
-    return wrapper;
+
+    // Вычисляем результат функции
+    let result = func(...args);
+
+    // Добавляем новый элемент в кеш
+    cache.push({ hash, value: result });
+
+    // Удаляем первый элемент, если кеш переполнен
+    if (cache.length > 5) {
+      cache.shift();
+    }
+
+    console.log("Вычисляем: " + result);
+    return "Вычисляем: " + result;
+  }
+
+  return wrapper;
 }
+
+// Примеры использования
+const addAndMultiply = (a, b, c) => (a + b) * c;
+const upgraded = cachingDecoratorNew(addAndMultiply);
+
+upgraded(1, 2, 3); // вычисляем: 9
+upgraded(1, 2, 3); // из кеша: 9
+upgraded(2, 2, 3); // вычисляем: 12
+upgraded(3, 2, 3); // вычисляем: 15
+upgraded(4, 2, 3); // вычисляем: 18
+upgraded(5, 2, 3); // вычисляем: 21
+upgraded(6, 2, 3); // вычисляем: 24 (при этом кеш для 1, 2, 3 уничтожается)
+upgraded(1, 2, 3); // вычисляем: 9  (снова вычисляем, кеша нет)
 
 //Задача № 2
 function debounceDecoratorNew(func, delay) {
-    let checkFunc = false;
-    return function(...args) {
-        if (checkFunc == false) {
-            func(...args);
-            checkFunc = true;
-            setTimeout(() => {
-                checkFunc = false, func(...args)
-            }, delay);
-        }
-    }
-}
-
-function debounceDecorator2(func) {
-    let checkFunc = false;
-
+    let timeoutId;
+    let isTrottled = false;
     function wrapper(...args) {
+      clearTimeout(timeoutId);
+      timeoutId = setTimeout( () => {
+        func(args);
         wrapper.count++;
-        if (checkFunc == false) {
-            func(...args);
-            checkFunc = true;
-            wrapper.count.push(i += 1)
-            setTimeout(() => {
-                checkFunc = false, func(...args)
-            }, delay);
-        }
+      }, delay);
+      if (!isTrottled) {
+        func(...args);
+        wrapper.count++;
+        isTrottled = true;
+      }
+      wrapper.allCount++;
     }
     wrapper.count = 0;
-    return wrapper
-}
+    wrapper.allCount = 0;
+    return wrapper;
+  }
