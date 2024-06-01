@@ -1,27 +1,23 @@
 //Задача № 1
-const md5 = require('js-md5').md5; // Импорт библиотеки для MD5
-
 function cachingDecoratorNew(func) {
   let cache = [];
 
   function wrapper(...args) {
-    const hash = md5(JSON.stringify(args)); // Хеширование аргументов
-    let objectInCache = cache.find(item => item.hash === hash); // Поиск в кеше
-
-    if (objectInCache) {
-      return `Из кеша: ${objectInCache.value}`; // Возвращение значения из кеша
+    const hash = args.join(',');
+    let idx = cache.findIndex((item) => item.hash === hash); // ищем элемент, хэш которого равен нашему хэшу
+    if (idx !== -1) { // если элемент не найден
+      console.log("Из кэша: " + cache[idx].value); // индекс нам известен, по индексу в массиве лежит объект, как получить нужное значение?
+      return "Из кэша: " + cache[idx].value;
+    } else {
+      let result = func(...args); // в кэше результата нет - придётся считать
+      cache.push({ hash: hash, value: result }); // добавляем элемент с правильной структурой
+      if (cache.length > 5) {
+        cache.shift(); // если слишком много элементов в кэше надо удалить самый старый (первый) 
+      }
+      console.log("Вычисляем: " + result);
+      return "Вычисляем: " + result;
     }
-
-    let result = func(...args); // Вызов функции
-    cache.push({ hash, value: result }); // Сохранение результата в кеше
-
-    if (cache.length > 5) {
-      cache.shift(); // Удаление первого элемента, если кеш переполнен
-    }
-
-    return `Вычисляем: ${result}`; // Возвращение строки с результатом
   }
-
   return wrapper;
 }
 
