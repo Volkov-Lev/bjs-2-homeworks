@@ -1,23 +1,19 @@
 //Задача № 1
 function cachingDecoratorNew(func) {
   let cache = [];
-
   function wrapper(...args) {
-    const hash = md5(JSON.stringify(args));
-    let objectInCache = cache.find(item => item.hash === hash);
+    const hash = md5(args);
+    let objectInCache = cache.find( item => item.hash === hash);
     if (objectInCache) {
-      console.log("Из кеша: " + objectInCache.value, cache);
+      console.log("Из кеша: " + objectInCache.value);
       return "Из кеша: " + objectInCache.value;
     }
     let result = func(...args);
-    cache.push({
-      hash: hash,
-      value: result
-    });
+    cache.push({"hash": hash, "value": result});
     if (cache.length > 5) {
       cache.shift();
     }
-    console.log("Вычисляем: " + result, cache);
+    console.log("Вычисляем: " + result);
     return "Вычисляем: " + result;
   }
   return wrapper;
@@ -26,31 +22,21 @@ function cachingDecoratorNew(func) {
 //Задача № 2
 function debounceDecoratorNew(func, delay) {
   let timeoutId;
-  let count = 0;
-  let allCount = 0;
-
+  let isTrottled = false;
   function wrapper(...args) {
-
-    if (timeoutId) {
-      console.log('уже есть таймаут', args);  
-      clearTimeout(timeoutId);
-      allCount++;
+    clearTimeout(timeoutId);
+    timeoutId = setTimeout( () => {
+      func(args);
+      wrapper.count++;
+    }, delay);
+    if (!isTrottled) {
+      func(...args);
+      wrapper.count++;
+      isTrottled = true;
     }
-    if (!timeoutId) {
-      console.log('первый вызов', args);
-      func.apply(this, args);
-      count++;
-    }
-
-    timeoutId = setTimeout(() => {
-      console.log('задержка больше ' + delay + ' млсек, сработал таймаут для ' + args);
-      func.apply(this, args);
-            count++;
-    }, delay);	
-
-        wrapper.allCount = allCount;
-        wrapper.count = count;
+    wrapper.allCount++;
   }
-
+  wrapper.count = 0;
+  wrapper.allCount = 0;
   return wrapper;
 }
