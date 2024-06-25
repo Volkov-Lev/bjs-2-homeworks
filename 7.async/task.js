@@ -57,7 +57,3 @@ class AlarmClock {
     }
 }
 
-// Пример использования класса AlarmClock:
-const clock = new AlarmClock();
-clock.addClock('06:30', () => console.log('Звонок будильника'));
-clock.start();
