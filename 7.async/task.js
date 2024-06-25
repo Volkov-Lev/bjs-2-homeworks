@@ -21,11 +21,10 @@ class AlarmClock {
     }
 
     getCurrentFormattedTime() {
-        const currentTime = new Date().toLocaleTimeString("ru-Ru", {
-            hour: "2-digit",
-            minute: "2-digit",
-        });
-        return currentTime.slice(0, -3);
+      new Date().toLocaleTimeString("ru-Ru", {
+        hour: "2-digit",
+        minute: "2-digit",
+      })
     }
 
     start() {
