@@ -21,8 +21,14 @@ class AlarmClock {
     }
   
     getCurrentFormattedTime() {
-        return new Date().toLocaleTimeString().slice(0, -3);
-    }
+        //return new Date().toLocaleTimeString().slice(0, -3);
+        const currentTime = new Date().toLocaleTimeString("ru-Ru", {
+          hour: "2-digit",
+          minute: "2-digit",
+      });
+      return currentTime.slice(0, -3);
+  }
+    
   
     start() {
       if (this.intervalId !== null) {
